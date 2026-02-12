@@ -1,0 +1,7 @@
+# Generated files by Cargo
+/target/
+
+# Optional: uncomment if you want to ignore the Cargo.lock file for a library project
+# Cargo.lock
+
+/blog-platform-service/uploads
