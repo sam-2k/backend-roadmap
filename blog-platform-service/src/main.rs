@@ -17,6 +17,7 @@ use rocket::{
     },
 };
 
+mod db;
 mod models;
 mod time;
 mod validate;
@@ -212,6 +213,7 @@ fn rocket() -> _ {
                 .expect("Something wrong when create `uploads` directory");
             rocket
         }))
+        .attach(db::stage())
         .mount(
             "/posts",
             routes![

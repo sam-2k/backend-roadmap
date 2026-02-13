@@ -1,4 +1,4 @@
-use rocket::data::{self, Data, FromData, ToByteUnit};
+use rocket::data::{self, Data, FromData};
 use rocket::http::Status;
 use rocket::serde::{Deserialize, json::Json};
 use validator::Validate;
