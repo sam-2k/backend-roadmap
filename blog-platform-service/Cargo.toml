@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 rocket = {version="0.5.1",features=["json"]}
 time = { version = "0.3", features = ["macros", "formatting"] }
+validator = { version = "0.16", features = ["derive"] }

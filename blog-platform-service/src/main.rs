@@ -13,9 +13,13 @@ use rocket::{
     http::Status,
     serde::{
         Deserialize, Serialize,
-        json::{Json, Value, from_str, to_string},
+        json::{Json, Value, from_str, to_string, to_value},
     },
 };
+
+mod models;
+mod time;
+mod validate;
 
 const UPLOAD_DIR: &'static str = "uploads";
 
@@ -59,56 +63,20 @@ struct ErrorMessage {
 type ErrorResponse = (Status, Json<ErrorMessage>);
 struct BlogCount(AtomicUsize);
 
-mod time;
-
-#[post("/", format = "json", data = "<blog>")]
+#[post("/", format = "json", data = "<blog_json>")]
 fn create(
-    blog: Json<BlogRequest>,
+    blog_json: validate::Validated<models::Blog>,
     blog_count: &State<BlogCount>,
-) -> Result<(Status, Json<Blog>), ErrorResponse> {
-    let blog: BlogRequest = blog.into_inner();
+) -> (Status, Json<Value>) {
+    let blog = blog_json.0.on_create(
+        blog_count
+            .0
+            .fetch_add(1, std::sync::atomic::Ordering::SeqCst),
+    );
 
-    let blog_id = blog_count.0.load(std::sync::atomic::Ordering::Relaxed);
-    blog_count
-        .0
-        .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-
-    // Get the current time in UTC
-    let created_at = time::get_now();
-    let updated_at = created_at.clone();
-
-    if !blog.validate() {
-        return Err((
-            Status::BadRequest,
-            Json(ErrorMessage {
-                message: "Please make sure all fields is filled".to_string(),
-            }),
-        ));
-    }
-
-    let json_blog = Json(Blog {
-        title: blog.title,
-        content: blog.content,
-        category: blog.category,
-        tags: blog.tags,
-        updatedAt: updated_at,
-        createdAt: created_at,
-        id: blog_id,
-    });
-
-    match write(
-        format!("{UPLOAD_DIR}/blog-{blog_id}.json"),
-        to_string(&json_blog.0).unwrap(),
-    ) {
-        Ok(()) => return Ok((Status::Created, json_blog)),
-        Err(err) => {
-            return Err((
-                Status::BadRequest,
-                Json(ErrorMessage {
-                    message: err.to_string(),
-                }),
-            ));
-        }
+    match to_value(blog) {
+        Ok(value) => (Status::Ok, Json(value)),
+        Err(_) => (Status::BadRequest, Json(Value::String("error".to_string()))),
     }
 }
 
