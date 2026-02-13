@@ -8,3 +8,4 @@ rocket = {version="0.5.1",features=["json"]}
 time = { version = "0.3", features = ["macros", "formatting"] }
 validator = { version = "0.16", features = ["derive"] }
 rusqlite = { version = "0.38.0", features = ["bundled"] }
+serde_json = "1.0"

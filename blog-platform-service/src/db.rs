@@ -3,11 +3,11 @@ use std::sync::{Arc, Mutex};
 use rocket::{
     State,
     fairing::AdHoc,
-    serde::json::{Json, Value, to_string, to_value},
+    serde::json::{Json, Value, to_value},
 };
 use rusqlite::Connection;
 
-struct DbConnection(Arc<Mutex<Connection>>);
+pub struct DbConnection(pub Arc<Mutex<Connection>>);
 
 #[post("/")]
 fn index(db_conn: &State<DbConnection>) -> String {
@@ -45,14 +45,15 @@ fn read_all_users(db_conn: &State<DbConnection>) -> Json<Value> {
 }
 
 pub fn stage() -> AdHoc {
-    let conn = Connection::open_in_memory().ok();
+    let conn: Option<Connection> = Connection::open_in_memory().ok();
 
     if let Some(conn) = &conn {
         conn.execute(
-            "CREATE TABLE person (
+            "CREATE TABLE blogs (
                   id    INTEGER PRIMARY KEY,
-                  name  TEXT NOT NULL,
-                  data  BLOB
+                  title  TEXT NOT NULL,
+                  content  TEXT NOT NULL,
+                  category TEXT NOT NULL
               )",
             (), // empty list of parameters.
         )

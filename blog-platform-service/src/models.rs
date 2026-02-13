@@ -15,7 +15,7 @@ pub struct Blog {
     pub tags: Vec<String>,
 
     #[serde(skip_deserializing, default)]
-    pub id: usize,
+    pub id: u32,
     #[serde(skip_deserializing, default, rename = "createdAt")]
     pub created_at: String,
     #[serde(skip_deserializing, default, rename = "updatedAt")]
@@ -25,7 +25,7 @@ pub struct Blog {
 }
 
 impl Blog {
-    pub fn on_create(mut self, id: usize) -> Blog {
+    pub fn on_create(mut self, id: u32) -> Blog {
         let now = match OffsetDateTime::now_utc().format(&Rfc3339).ok() {
             Some(now) => now,
             _ => String::new(),
@@ -33,6 +33,16 @@ impl Blog {
 
         self.id = id;
         self.created_at = now.clone();
+        self.updated_at = now;
+        self
+    }
+
+    pub fn on_update(mut self) -> Blog {
+        let now = match OffsetDateTime::now_utc().format(&Rfc3339).ok() {
+            Some(now) => now,
+            _ => String::new(),
+        };
+
         self.updated_at = now;
         self
     }
