@@ -20,8 +20,6 @@ pub struct Blog {
     pub created_at: String,
     #[serde(skip_deserializing, default, rename = "updatedAt")]
     pub updated_at: String,
-    #[serde(skip_deserializing, skip_serializing, default)]
-    pub _deleted_at: Option<String>,
 }
 
 impl Blog {

@@ -53,7 +53,8 @@ pub fn stage() -> AdHoc {
                   id    INTEGER PRIMARY KEY,
                   title  TEXT NOT NULL,
                   content  TEXT NOT NULL,
-                  category TEXT NOT NULL
+                  category TEXT NOT NULL,
+                  deleted_at TEXT DEFAULT NULL
               )",
             (), // empty list of parameters.
         )
